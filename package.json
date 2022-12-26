@@ -33,6 +33,7 @@
     "typescript": "^4.0.0"
   },
   "dependencies": {
+    "@civ-clone/base-player-action-launch-spaceship": "^0.1.0",
     "@civ-clone/base-science-advance-plastics": "^0.1.0",
     "@civ-clone/base-science-advance-robotics": "^0.1.0",
     "@civ-clone/base-science-advance-spaceflight": "^0.1.0",
@@ -47,6 +48,7 @@
     "@civ-clone/base-spaceship-yield-mass": "^0.1.0",
     "@civ-clone/base-spaceship-yield-population": "^0.1.0",
     "@civ-clone/base-wonder-apolloprogram": "^0.1.1",
+    "@civ-clone/civ1-default-spaceship-layout": "github:civ-clone/civ1-default-spaceship-layout",
     "@civ-clone/core-city-build": "^0.1.0",
     "@civ-clone/core-engine": "^0.1.3",
     "@civ-clone/core-player": "^0.1.7",
@@ -54,5 +56,6 @@
     "@civ-clone/core-spaceship": "^0.1.1",
     "@civ-clone/core-turn-based-game": "^0.1.5",
     "@civ-clone/core-yield": "^0.1.4"
-  }
+  },
+  "packageManager": "yarn@1.22.19"
 }

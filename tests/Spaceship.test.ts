@@ -20,10 +20,10 @@ import { setUpCity } from '@civ-clone/civ1-city/tests/lib/setUpCity';
 import { expect } from 'chai';
 import { reduceYields } from '@civ-clone/core-yield/lib/reduceYields';
 import { Energy, LifeSupport, Mass, Population } from '../Yields';
-import defaultLayout from '../Layouts/default';
 import chooseSlot from '../Rules/Spaceship/choose-slot';
 import Slot from '@civ-clone/core-spaceship/Slot';
 import reduceYieldWithUsed from '../lib/reduceYieldWithUsed';
+import Default from '@civ-clone/civ1-default-spaceship-layout/Default';
 
 describe('Spaceship', () => {
   it('should return expected values depending on the added components', async () => {
@@ -97,7 +97,7 @@ describe('Spaceship', () => {
         expectedFlightTime,
       ]) => {
         const player = new Player(ruleRegistry),
-          [layout] = defaultLayout(),
+          layout = new Default(),
           spaceship = new Spaceship(player, layout, ruleRegistry);
 
         spaceshipRegistry.register(spaceship);
@@ -176,7 +176,7 @@ describe('Spaceship', () => {
     );
 
     const player = new Player(ruleRegistry),
-      [layout] = defaultLayout(),
+      layout = new Default(),
       spaceship = new Spaceship(player, layout, ruleRegistry);
 
     spaceshipRegistry.register(spaceship);
