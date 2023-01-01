@@ -1,8 +1,4 @@
 import {
-  BuildableInstance,
-  IBuildable,
-} from '@civ-clone/core-city-build/Buildable';
-import {
   Fuel,
   Habitation,
   LifeSupport,
@@ -14,6 +10,7 @@ import AdvanceRegistry from '@civ-clone/core-science/AdvanceRegistry';
 import ApolloProgram from '@civ-clone/base-wonder-apolloprogram/ApolloProgram';
 import AvailableCityBuildItemsRegistry from '@civ-clone/core-city-build/AvailableCityBuildItemsRegistry';
 import BuildItem from '@civ-clone/core-city-build/BuildItem';
+import BuildableInstance from '@civ-clone/core-city-build/Buildable';
 import BuildingComplete from '@civ-clone/core-city-build/Rules/BulidingComplete';
 import CityBuild from '@civ-clone/core-city-build/CityBuild';
 import Criterion from '@civ-clone/core-rule/Criterion';
