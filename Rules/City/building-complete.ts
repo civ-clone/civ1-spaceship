@@ -23,6 +23,7 @@ import { BuildableInstance } from '@civ-clone/core-city-build/Buildable';
 import BuildingComplete from '@civ-clone/core-city-build/Rules/BulidingComplete';
 import CityBuild from '@civ-clone/core-city-build/CityBuild';
 import Criterion from '@civ-clone/core-rule/Criterion';
+import Default from '@civ-clone/civ1-default-spaceship-layout/Default';
 import Effect from '@civ-clone/core-rule/Effect';
 import Part from '@civ-clone/core-spaceship/Part';
 import Player from '@civ-clone/core-player/Player';
@@ -43,7 +44,8 @@ export const getRules = (
     ),
     new Effect(() => {
       // TODO: if there is more than one layout, ask the player to choose.
-      const [layout] = layoutRegistry.entries();
+      const [LayoutType] = layoutRegistry.entries() as typeof Default[],
+        layout = new LayoutType(ruleRegistry);
 
       currentPlayerRegistry
         .entries()

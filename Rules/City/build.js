@@ -15,7 +15,13 @@ const Robotics_1 = require("@civ-clone/base-science-advance-robotics/Robotics");
 const SpaceFlight_1 = require("@civ-clone/base-science-advance-spaceflight/SpaceFlight");
 const getRules = (wonderRegistry = WonderRegistry_1.instance, playerResearchRegistry = PlayerResearchRegistry_1.instance, spaceshipRegistry = SpaceshipRegistry_1.instance) => [
     new Build_1.Build(new Criterion_1.default((city, BuildItem) => Object.prototype.isPrototypeOf.call(Part_1.default, BuildItem)), new Effect_1.default(() => new Criterion_1.default(() => wonderRegistry.some((wonder) => wonder instanceof ApolloProgram_1.default)))),
-    new Build_1.Build(new Criterion_1.default((city, BuildItem) => Object.prototype.isPrototypeOf.call(Part_1.default, BuildItem)), new Effect_1.default((city) => new Criterion_1.default(() => spaceshipRegistry.getActiveByPlayer(city.player()) !== null))),
+    new Build_1.Build(new Criterion_1.default((city, BuildItem) => Object.prototype.isPrototypeOf.call(Part_1.default, BuildItem)), new Effect_1.default((city) => new Criterion_1.default(() => {
+        const spaceship = spaceshipRegistry.getActiveByPlayer(city.player());
+        if (spaceship === null) {
+            return false;
+        }
+        return spaceship.launched() === false;
+    }))),
     ...[
         [Parts_1.Structural, SpaceFlight_1.default],
         [Parts_1.Fuel, Plastics_1.default],

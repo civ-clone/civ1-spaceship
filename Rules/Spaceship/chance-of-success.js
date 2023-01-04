@@ -31,7 +31,7 @@ const getRules = () => [
                 population,
             ];
         }, [0, 0, 0, 0, 0]);
-        const [totalFuel, totalPropulsion] = spaceship.parts().reduce(([totalFuel, totalPropulsion], part) => {
+        const [totalFuel, totalPropulsion] = spaceship.activeParts().reduce(([totalFuel, totalPropulsion], part) => {
             if (part instanceof Parts_1.Fuel) {
                 totalFuel++;
             }

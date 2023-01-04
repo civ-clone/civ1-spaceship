@@ -1,12 +1,4 @@
-import RuleRegistry from '@civ-clone/core-rule/RuleRegistry';
-import SpaceshipRegistry from '@civ-clone/core-spaceship/SpaceshipRegistry';
-import chanceOfSuccess from '../Rules/Spaceship/chance-of-success';
-import flightTime from '../Rules/Spaceship/flight-time';
-import lost from '../Rules/Spaceship/lost';
-import validate from '../Rules/Spaceship/validate';
-import partYield from '../Rules/Spaceship/yield';
-import Player from '@civ-clone/core-player/Player';
-import Spaceship from '@civ-clone/core-spaceship/Spaceship';
+import { Energy, LifeSupport, Mass, Population } from '../Yields';
 import {
   Fuel,
   Habitation,
@@ -15,15 +7,31 @@ import {
   Structural,
   LifeSupport as LifeSupportPart,
 } from '../Parts';
-import Part from '@civ-clone/core-spaceship/Part';
-import { setUpCity } from '@civ-clone/civ1-city/tests/lib/setUpCity';
-import { expect } from 'chai';
-import { reduceYields } from '@civ-clone/core-yield/lib/reduceYields';
-import { Energy, LifeSupport, Mass, Population } from '../Yields';
-import chooseSlot from '../Rules/Spaceship/choose-slot';
-import Slot from '@civ-clone/core-spaceship/Slot';
-import reduceYieldWithUsed from '../lib/reduceYieldWithUsed';
+import {
+  reduceYield,
+  reduceYields,
+} from '@civ-clone/core-yield/lib/reduceYields';
 import Default from '@civ-clone/civ1-default-spaceship-layout/Default';
+import Layout from '@civ-clone/core-spaceship/Layout';
+import Player from '@civ-clone/core-player/Player';
+import Part from '@civ-clone/core-spaceship/Part';
+import RuleRegistry from '@civ-clone/core-rule/RuleRegistry';
+import Slot from '@civ-clone/core-spaceship/Slot';
+import Spaceship from '@civ-clone/core-spaceship/Spaceship';
+import SpaceshipRegistry from '@civ-clone/core-spaceship/SpaceshipRegistry';
+import Turn from '@civ-clone/core-turn-based-game/Turn';
+import Year from '@civ-clone/core-game-year/Year';
+import active from '../Rules/Spaceship/active';
+import chanceOfSuccess from '../Rules/Spaceship/chance-of-success';
+import chooseSlot from '../Rules/Spaceship/choose-slot';
+import { expect } from 'chai';
+import flightTime from '../Rules/Spaceship/flight-time';
+import lost from '../Rules/Spaceship/lost';
+import partYield from '../Rules/Spaceship/yield';
+import reduceYieldWithUsed from '../lib/reduceYieldWithUsed';
+import { setUpCity } from '@civ-clone/civ1-city/tests/lib/setUpCity';
+import turnYear from '@civ-clone/civ1-game-year/Rules/Turn/year';
+import layoutToText from './lib/layoutToText';
 
 describe('Spaceship', () => {
   it('should return expected values depending on the added components', async () => {
@@ -31,15 +39,18 @@ describe('Spaceship', () => {
       spaceshipRegistry = new SpaceshipRegistry(),
       city = await setUpCity({
         ruleRegistry,
-      });
+      }),
+      turn = new Turn(),
+      year = new Year(turn, ruleRegistry);
 
     ruleRegistry.register(
+      ...active(),
       ...chanceOfSuccess(),
       ...chooseSlot(),
-      ...flightTime(),
+      ...flightTime(year, turn),
       ...lost(spaceshipRegistry, undefined, ruleRegistry),
-      ...validate(),
-      ...partYield()
+      ...partYield(),
+      ...turnYear()
     );
 
     (
@@ -53,8 +64,8 @@ describe('Spaceship', () => {
         // expectedPropulsion,
         // expectedChanceOfSuccess,
         // expectedFlightTime,
-        [[[Structural, 34]], 34, 3400, 0, 0, 0, 0, 0, 170],
-        [[[Structural, 38]], 34, 3400, 0, 0, 0, 0, 0, 170],
+        [[[Structural, 34]], 34, 3400, 0, 0, 0, 0, 0, 9],
+        [[[Structural, 38]], 34, 3400, 0, 0, 0, 0, 0, 9],
         [
           [
             [Structural, 34],
@@ -71,7 +82,7 @@ describe('Spaceship', () => {
           1,
           1,
           1,
-          14.9,
+          1,
         ],
       ] as [
         [typeof Part, number][],
@@ -97,7 +108,7 @@ describe('Spaceship', () => {
         expectedFlightTime,
       ]) => {
         const player = new Player(ruleRegistry),
-          layout = new Default(),
+          layout = new Default(ruleRegistry),
           spaceship = new Spaceship(player, layout, ruleRegistry);
 
         spaceshipRegistry.register(spaceship);
@@ -108,7 +119,7 @@ describe('Spaceship', () => {
           }
         });
 
-        expect(spaceship.parts().length, 'number of parts').eq(
+        expect(spaceship.activeParts(), 'number of parts').length(
           expectedNumberOfParts
         );
 
@@ -128,7 +139,7 @@ describe('Spaceship', () => {
             lifeSupport === 0
               ? 0
               : Math.min(1, lifeSupportRequired / lifeSupport),
-          [fuel, propulsion] = spaceship.parts().reduce(
+          [fuel, propulsion] = spaceship.activeParts().reduce(
             ([fuel, propulsion], part: Part) => {
               if (part instanceof Fuel) {
                 fuel += 1;
@@ -167,24 +178,25 @@ describe('Spaceship', () => {
       });
 
     ruleRegistry.register(
+      ...active(),
       ...chanceOfSuccess(),
       ...chooseSlot(),
       ...flightTime(),
       ...lost(spaceshipRegistry, undefined, ruleRegistry),
-      ...validate(),
-      ...partYield()
+      ...partYield(),
+      ...turnYear()
     );
 
     const player = new Player(ruleRegistry),
-      layout = new Default(),
+      layout = new Default(ruleRegistry),
       spaceship = new Spaceship(player, layout, ruleRegistry);
 
     spaceshipRegistry.register(spaceship);
 
     (
       [
-        [Structural, 8, 7],
-        [Structural, 8, 4],
+        [Structural, 8, 6],
+        [Structural, 8, 5],
         [Fuel, 9, 6],
         [Propulsion, 10, 6],
         [Habitation, 6, 4],
@@ -202,5 +214,103 @@ describe('Spaceship', () => {
 
       expect([usedSlot.x(), usedSlot.y()]).eql([x, y]);
     });
+  });
+
+  it('should not count `Yield`s for inactive `Slot`s', async () => {
+    const ruleRegistry = new RuleRegistry(),
+      spaceshipRegistry = new SpaceshipRegistry(),
+      city = await setUpCity({
+        ruleRegistry,
+      });
+
+    ruleRegistry.register(
+      ...active(),
+      ...chanceOfSuccess(),
+      ...chooseSlot(),
+      ...flightTime(),
+      ...lost(spaceshipRegistry, undefined, ruleRegistry),
+      ...partYield(),
+      ...turnYear()
+    );
+
+    const player = new Player(ruleRegistry),
+      layout = new Default(ruleRegistry),
+      spaceship = new Spaceship(player, layout, ruleRegistry);
+
+    spaceshipRegistry.register(spaceship);
+
+    spaceship.add(new Propulsion(city, ruleRegistry));
+
+    expect(spaceship.activeParts()).length(0);
+    expect(spaceship.inactiveParts()).length(1);
+
+    spaceship.add(new Fuel(city, ruleRegistry));
+
+    expect(spaceship.activeParts()).length(0);
+    expect(spaceship.inactiveParts()).length(2);
+
+    spaceship.add(new Structural(city, ruleRegistry));
+
+    expect(spaceship.activeParts()).length(3);
+    expect(spaceship.inactiveParts()).length(0);
+
+    spaceship.add(new Habitation(city, ruleRegistry));
+
+    expect(spaceship.activeParts()).length(3);
+    expect(spaceship.inactiveParts()).length(1);
+    expect(reduceYield(spaceship.yields(), Population)).eq(0);
+
+    spaceship.add(new Structural(city, ruleRegistry));
+
+    expect(spaceship.activeParts()).length(5);
+    expect(spaceship.inactiveParts()).length(0);
+    expect(reduceYield(spaceship.yields(), Population)).eq(10000);
+
+    spaceship.add(new LifeSupportPart(city, ruleRegistry));
+
+    expect(spaceship.activeParts()).length(6);
+    expect(spaceship.inactiveParts()).length(0);
+
+    spaceship.add(new Power(city, ruleRegistry));
+
+    expect(spaceship.activeParts()).length(6);
+    expect(spaceship.inactiveParts()).length(1);
+    expect(reduceYield(spaceship.yields(), Energy)).eq(-100);
+
+    spaceship.add(new Structural(city, ruleRegistry));
+
+    expect(spaceship.activeParts()).length(7);
+    expect(spaceship.inactiveParts()).length(1);
+
+    spaceship.add(new Structural(city, ruleRegistry));
+
+    expect(spaceship.activeParts()).length(8);
+    expect(spaceship.inactiveParts()).length(1);
+
+    spaceship.add(new Structural(city, ruleRegistry));
+
+    expect(spaceship.activeParts()).length(9);
+    expect(spaceship.inactiveParts()).length(1);
+
+    spaceship.add(new Structural(city, ruleRegistry));
+
+    expect(spaceship.activeParts()).length(10);
+    expect(spaceship.inactiveParts()).length(1);
+
+    spaceship.add(new Structural(city, ruleRegistry));
+
+    expect(spaceship.activeParts()).length(11);
+    expect(spaceship.inactiveParts()).length(1);
+
+    spaceship.add(new Structural(city, ruleRegistry));
+
+    expect(spaceship.activeParts()).length(12);
+    expect(spaceship.inactiveParts()).length(1);
+
+    spaceship.add(new Structural(city, ruleRegistry));
+
+    expect(spaceship.activeParts()).length(14);
+    expect(spaceship.inactiveParts()).length(0);
+    expect(reduceYield(spaceship.yields(), Energy)).eq(0);
   });
 });

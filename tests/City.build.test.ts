@@ -10,7 +10,7 @@ import AdvanceRegistry from '@civ-clone/core-science/AdvanceRegistry';
 import ApolloProgram from '@civ-clone/base-wonder-apolloprogram/ApolloProgram';
 import AvailableCityBuildItemsRegistry from '@civ-clone/core-city-build/AvailableCityBuildItemsRegistry';
 import BuildItem from '@civ-clone/core-city-build/BuildItem';
-import BuildableInstance from '@civ-clone/core-city-build/Buildable';
+import { BuildableInstance } from '@civ-clone/core-city-build/Buildable';
 import BuildingComplete from '@civ-clone/core-city-build/Rules/BulidingComplete';
 import CityBuild from '@civ-clone/core-city-build/CityBuild';
 import Criterion from '@civ-clone/core-rule/Criterion';
@@ -33,6 +33,8 @@ import buildingComplete from '../Rules/City/building-complete';
 import { expect } from 'chai';
 import { setUpCity } from '@civ-clone/civ1-city/tests/lib/setUpCity';
 import Part from '@civ-clone/core-spaceship/Part';
+import { LayoutRegistry } from '@civ-clone/core-spaceship/LayoutRegistry';
+import Default from '@civ-clone/civ1-default-spaceship-layout/Default';
 
 const getBuildablesFromBuildItems = (buildItems: BuildItem[]) =>
   buildItems.map((buildItem) => buildItem.item());
@@ -42,6 +44,7 @@ describe('City:build', () => {
     const availableBuildItemsRegistry = new AvailableCityBuildItemsRegistry(),
       advanceRegistry = new AdvanceRegistry(),
       currentPlayerRegistry = new CurrentPlayerRegistry(),
+      layoutRegistry = new LayoutRegistry(),
       wonderRegistry = new WonderRegistry(),
       playerResearchRegistry = new PlayerResearchRegistry(),
       spaceshipRegistry = new SpaceshipRegistry(),
@@ -69,6 +72,8 @@ describe('City:build', () => {
 
     currentPlayerRegistry.register(city.player());
 
+    layoutRegistry.register(Default);
+
     playerResearchRegistry.register(playerResearch);
 
     ruleRegistry.register(
@@ -77,6 +82,7 @@ describe('City:build', () => {
       ...buildingComplete(
         currentPlayerRegistry,
         spaceshipRegistry,
+        layoutRegistry,
         ruleRegistry
       ),
       new BuildingComplete(

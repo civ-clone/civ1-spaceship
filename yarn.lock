@@ -1794,6 +1794,13 @@
     "@civ-clone/core-world" "^0.1.10"
     "@civ-clone/core-world-generator" "^0.1.2"
 
+"@civ-clone/civ1-game-year@github:civ-clone/civ1-game-year":
+  version "0.1.0"
+  resolved "https://codeload.github.com/civ-clone/civ1-game-year/tar.gz/4bafdbaec52d1596c9c80ea06bcb819535378c16"
+  dependencies:
+    "@civ-clone/core-game-year" "^0.1.0"
+    "@civ-clone/core-rule" "^0.1.0"
+
 "@civ-clone/civ1-government@github:civ-clone/civ1-government":
   version "0.1.0"
   resolved "https://codeload.github.com/civ-clone/civ1-government/tar.gz/ec2b5961ac85fc22c2d64adec414b085ffad17d4"
@@ -2107,6 +2114,15 @@
     "@civ-clone/core-rule" "^0.1.0"
     "@dom111/typed-event-emitter" "^0.1.2"
 
+"@civ-clone/core-game-year@^0.1.0", "@civ-clone/core-game-year@^0.1.2":
+  version "0.1.2"
+  resolved "https://registry.yarnpkg.com/@civ-clone/core-game-year/-/core-game-year-0.1.2.tgz#de64276314b07b9257607c4f0963152bf110242c"
+  integrity sha512-Lq3Ry72J765D62w/QoQkNvQPOgY0ZQDiKoB2mZiy5Q74STqfDCy9r+9K7K1ot6KJ80Vs5G7CIHoLOKAkPRwpaw==
+  dependencies:
+    "@civ-clone/core-data-object" "^0.1.0"
+    "@civ-clone/core-rule" "^0.1.0"
+    "@civ-clone/core-turn-based-game" "^0.1.0"
+
 "@civ-clone/core-government@^0.1.0", "@civ-clone/core-government@^0.1.3":
   version "0.1.4"
   resolved "https://registry.yarnpkg.com/@civ-clone/core-government/-/core-government-0.1.4.tgz#dc6fb96432b97d858dcca081f6ee1541b9551120"
@@ -2165,9 +2181,9 @@
     "@civ-clone/core-yield" "^0.1.0"
 
 "@civ-clone/core-spaceship@^0.1.0", "@civ-clone/core-spaceship@^0.1.1":
-  version "0.1.2"
-  resolved "https://registry.yarnpkg.com/@civ-clone/core-spaceship/-/core-spaceship-0.1.2.tgz#f904c2cc660cf515112b2af5386ac6d29dc48867"
-  integrity sha512-og9IQVpuWYw6YR3S+4Ywl0UVraR7mEWw2Om56p/OKqJnAILLH40i6kI3/PW5ZabNBEIU2YlJEK9XrNlD1sqXow==
+  version "0.1.5"
+  resolved "https://registry.yarnpkg.com/@civ-clone/core-spaceship/-/core-spaceship-0.1.5.tgz#3aabde550656c4853d95eef293d71b7f457c2d55"
+  integrity sha512-aU3vHEYoCRCIwzBYKYlPXLy61nerIHsM8Op9e88TIHVv3gFDK1yB7PHHsanh3ULgs2BpeNOqg8nCxauePq52MQ==
   dependencies:
     "@civ-clone/core-city" "^0.1.9"
     "@civ-clone/core-city-build" "^0.1.7"
@@ -2207,6 +2223,18 @@
     "@civ-clone/core-rule" "^0.1.0"
     "@civ-clone/core-terrain" "^0.1.0"
     "@civ-clone/core-world" "^0.1.0"
+
+"@civ-clone/core-treasury@^0.1.3":
+  version "0.1.3"
+  resolved "https://registry.yarnpkg.com/@civ-clone/core-treasury/-/core-treasury-0.1.3.tgz#9aaa94cb81e239a83d6f6fec9028b307015eb601"
+  integrity sha512-+KrwiRLJov7IT5bttB8v0/Pw1/x7YH4LPxG1DUcrTAswodaUF3Ui7HoUiBjjYPhrI2jrzmcLYiBr6VYPImmD3Q==
+  dependencies:
+    "@civ-clone/core-city" "^0.1.0"
+    "@civ-clone/core-city-build" "^0.1.0"
+    "@civ-clone/core-player" "^0.1.0"
+    "@civ-clone/core-registry" "^0.1.0"
+    "@civ-clone/core-rule" "^0.1.0"
+    "@civ-clone/core-yield" "^0.1.0"
 
 "@civ-clone/core-turn-based-game@^0.1.0", "@civ-clone/core-turn-based-game@^0.1.5":
   version "0.1.5"
@@ -2872,9 +2900,9 @@ js-yaml@4.1.0:
     argparse "^2.0.1"
 
 json5@^1.0.1:
-  version "1.0.1"
-  resolved "https://registry.yarnpkg.com/json5/-/json5-1.0.1.tgz#779fb0018604fa854eacbf6252180d83543e3dbe"
-  integrity sha512-aKS4WQjPenRxiQsC93MNfjx+nbF4PAdYzmd/1JIj8HYzqfbu86beTuNgXDzPknWk0n0uARlyewZo4s++ES36Ow==
+  version "1.0.2"
+  resolved "https://registry.yarnpkg.com/json5/-/json5-1.0.2.tgz#63d98d60f21b313b77c4d6da18bfa69d80e1d593"
+  integrity sha512-g1MWMLBiz8FKi1e4w0UyVL3w+iJceWAFBAaBnnGKOpNa5f8TLktkbre1+s6oICydWAm+HRUGTmI+//xv2hvXYA==
   dependencies:
     minimist "^1.2.0"
 

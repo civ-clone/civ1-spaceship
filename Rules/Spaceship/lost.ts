@@ -1,4 +1,12 @@
 import {
+  Engine,
+  instance as engineInstance,
+} from '@civ-clone/core-engine/Engine';
+import {
+  LayoutRegistry,
+  instance as layoutRegistryInstance,
+} from '@civ-clone/core-spaceship/LayoutRegistry';
+import {
   RuleRegistry,
   instance as ruleRegistryInstance,
 } from '@civ-clone/core-rule/RuleRegistry';
@@ -10,25 +18,30 @@ import {
   Turn,
   instance as turnInstance,
 } from '@civ-clone/core-turn-based-game/Turn';
+import Default from '@civ-clone/civ1-default-spaceship-layout/Default';
 import Effect from '@civ-clone/core-rule/Effect';
 import Lost from '@civ-clone/core-spaceship/Rules/Lost';
 import Spaceship from '@civ-clone/core-spaceship/Spaceship';
-import {
-  instance as layoutRegistryInstance,
-  LayoutRegistry,
-} from '@civ-clone/core-spaceship/LayoutRegistry';
 
 export const getRules = (
   spaceshipRegistry: SpaceshipRegistry = spaceshipRegistryInstance,
   layoutRegistry: LayoutRegistry = layoutRegistryInstance,
   ruleRegistry: RuleRegistry = ruleRegistryInstance,
   turn: Turn = turnInstance,
+  engine: Engine = engineInstance,
   randomNumberGenerator: () => number = () => Math.random()
 ): Lost[] => [
   new Lost(
     new Effect((spaceship: Spaceship) => {
+      engine.emit('player:spaceship:lost', spaceship.player());
+    })
+  ),
+
+  new Lost(
+    new Effect((spaceship: Spaceship) => {
       // TODO: if there is more than one layout, ask the player to choose.
-      const [layout] = layoutRegistry.entries();
+      const [LayoutType] = layoutRegistry.entries() as typeof Default[],
+        layout = new LayoutType(ruleRegistry);
 
       spaceshipRegistry.register(
         new Spaceship(

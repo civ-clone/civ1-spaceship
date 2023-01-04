@@ -57,7 +57,7 @@ export const getRules = (): ChanceOfSuccess[] => [
         [0, 0, 0, 0, 0]
       );
 
-      const [totalFuel, totalPropulsion] = spaceship.parts().reduce(
+      const [totalFuel, totalPropulsion] = spaceship.activeParts().reduce(
         ([totalFuel, totalPropulsion], part: Part) => {
           if (part instanceof Fuel) {
             totalFuel++;

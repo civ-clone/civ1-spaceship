@@ -53,9 +53,15 @@ export const getRules = (
     ),
     new Effect(
       (city: City) =>
-        new Criterion(
-          () => spaceshipRegistry.getActiveByPlayer(city.player()) !== null
-        )
+        new Criterion(() => {
+          const spaceship = spaceshipRegistry.getActiveByPlayer(city.player());
+
+          if (spaceship === null) {
+            return false;
+          }
+
+          return spaceship.launched() === false;
+        })
     )
   ),
 
