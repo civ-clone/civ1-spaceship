@@ -18,6 +18,7 @@
     "ts:compile": "tsc --build tsconfig.json"
   },
   "devDependencies": {
+    "@civ-clone/base-city-yield-gold": "^0.1.0",
     "@civ-clone/base-terrain-yield-production": "^0.1.0",
     "@civ-clone/civ1-city": "github:civ-clone/civ1-city",
     "@civ-clone/civ1-game-year": "github:civ-clone/civ1-game-year",
