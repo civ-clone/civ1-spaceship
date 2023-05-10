@@ -47,7 +47,7 @@ describe('Spaceship', () => {
       ...active(),
       ...chanceOfSuccess(),
       ...chooseSlot(),
-      ...flightTime(year, turn),
+      ...flightTime(),
       ...lost(spaceshipRegistry, undefined, ruleRegistry),
       ...partYield(),
       ...turnYear()
@@ -64,8 +64,8 @@ describe('Spaceship', () => {
         // expectedPropulsion,
         // expectedChanceOfSuccess,
         // expectedFlightTime,
-        [[[Structural, 34]], 34, 3400, 0, 0, 0, 0, 0, 9],
-        [[[Structural, 38]], 34, 3400, 0, 0, 0, 0, 0, 9],
+        [[[Structural, 34]], 34, 3400, 0, 0, 0, 0, 0, 170],
+        [[[Structural, 38]], 34, 3400, 0, 0, 0, 0, 0, 170],
         [
           [
             [Structural, 34],
@@ -82,7 +82,7 @@ describe('Spaceship', () => {
           1,
           1,
           1,
-          1,
+          14.9,
         ],
       ] as [
         [typeof Part, number][],

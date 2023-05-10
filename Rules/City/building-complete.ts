@@ -18,6 +18,7 @@ import {
   Turn,
   instance as turnInstance,
 } from '@civ-clone/core-turn-based-game/Turn';
+import { Year, instance as yearInstance } from '@civ-clone/core-game-year/Year';
 import ApolloProgram from '@civ-clone/base-wonder-apolloprogram/ApolloProgram';
 import { BuildableInstance } from '@civ-clone/core-city-build/Buildable';
 import BuildingComplete from '@civ-clone/core-city-build/Rules/BulidingComplete';
@@ -35,6 +36,7 @@ export const getRules = (
   layoutRegistry: LayoutRegistry = layoutRegistryInstance,
   ruleRegistry: RuleRegistry = ruleRegistryInstance,
   turn: Turn = turnInstance,
+  year: Year = yearInstance,
   randomNumberGenerator: () => number = () => Math.random()
 ): BuildingComplete[] => [
   new BuildingComplete(
@@ -44,7 +46,7 @@ export const getRules = (
     ),
     new Effect(() => {
       // TODO: if there is more than one layout, ask the player to choose.
-      const [LayoutType] = layoutRegistry.entries() as typeof Default[],
+      const [LayoutType] = layoutRegistry.entries() as (typeof Default)[],
         layout = new LayoutType(ruleRegistry);
 
       currentPlayerRegistry
@@ -56,6 +58,7 @@ export const getRules = (
               layout,
               ruleRegistry,
               turn,
+              year,
               randomNumberGenerator
             )
           )

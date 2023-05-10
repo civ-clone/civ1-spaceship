@@ -18,6 +18,7 @@ import {
   Turn,
   instance as turnInstance,
 } from '@civ-clone/core-turn-based-game/Turn';
+import { Year, instance as yearInstance } from '@civ-clone/core-game-year/Year';
 import Default from '@civ-clone/civ1-default-spaceship-layout/Default';
 import Effect from '@civ-clone/core-rule/Effect';
 import Lost from '@civ-clone/core-spaceship/Rules/Lost';
@@ -28,6 +29,7 @@ export const getRules = (
   layoutRegistry: LayoutRegistry = layoutRegistryInstance,
   ruleRegistry: RuleRegistry = ruleRegistryInstance,
   turn: Turn = turnInstance,
+  year: Year = yearInstance,
   engine: Engine = engineInstance,
   randomNumberGenerator: () => number = () => Math.random()
 ): Lost[] => [
@@ -40,7 +42,7 @@ export const getRules = (
   new Lost(
     new Effect((spaceship: Spaceship) => {
       // TODO: if there is more than one layout, ask the player to choose.
-      const [LayoutType] = layoutRegistry.entries() as typeof Default[],
+      const [LayoutType] = layoutRegistry.entries() as (typeof Default)[],
         layout = new LayoutType(ruleRegistry);
 
       spaceshipRegistry.register(
@@ -49,6 +51,7 @@ export const getRules = (
           layout,
           ruleRegistry,
           turn,
+          year,
           randomNumberGenerator
         )
       );
