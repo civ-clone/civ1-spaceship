@@ -23,6 +23,7 @@ import Default from '@civ-clone/civ1-default-spaceship-layout/Default';
 import Effect from '@civ-clone/core-rule/Effect';
 import Lost from '@civ-clone/core-spaceship/Rules/Lost';
 import Spaceship from '@civ-clone/core-spaceship/Spaceship';
+import { instance as rngInstance } from '@civ-clone/core-random';
 
 export const getRules = (
   spaceshipRegistry: SpaceshipRegistry = spaceshipRegistryInstance,
@@ -31,7 +32,7 @@ export const getRules = (
   turn: Turn = turnInstance,
   year: Year = yearInstance,
   engine: Engine = engineInstance,
-  randomNumberGenerator: () => number = () => Math.random()
+  randomNumberGenerator: () => number = rngInstance
 ): Lost[] => [
   new Lost(
     new Effect((spaceship: Spaceship) => {

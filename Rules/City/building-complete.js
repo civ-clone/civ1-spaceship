@@ -13,7 +13,8 @@ const Criterion_1 = require("@civ-clone/core-rule/Criterion");
 const Effect_1 = require("@civ-clone/core-rule/Effect");
 const Part_1 = require("@civ-clone/core-spaceship/Part");
 const Spaceship_1 = require("@civ-clone/core-spaceship/Spaceship");
-const getRules = (currentPlayerRegistry = CurrentPlayerRegistry_1.instance, spaceshipRegistry = SpaceshipRegistry_1.instance, layoutRegistry = LayoutRegistry_1.instance, ruleRegistry = RuleRegistry_1.instance, turn = Turn_1.instance, year = Year_1.instance, randomNumberGenerator = () => Math.random()) => [
+const core_random_1 = require("@civ-clone/core-random");
+const getRules = (currentPlayerRegistry = CurrentPlayerRegistry_1.instance, spaceshipRegistry = SpaceshipRegistry_1.instance, layoutRegistry = LayoutRegistry_1.instance, ruleRegistry = RuleRegistry_1.instance, turn = Turn_1.instance, year = Year_1.instance, randomNumberGenerator = core_random_1.instance) => [
     new BulidingComplete_1.default(new Criterion_1.default((cityBuild, buildItem) => buildItem instanceof ApolloProgram_1.default), new Effect_1.default(() => {
         // TODO: if there is more than one layout, ask the player to choose.
         const [LayoutType] = layoutRegistry.entries(), layout = new LayoutType(ruleRegistry);

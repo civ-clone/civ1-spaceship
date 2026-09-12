@@ -10,7 +10,8 @@ const Year_1 = require("@civ-clone/core-game-year/Year");
 const Effect_1 = require("@civ-clone/core-rule/Effect");
 const Lost_1 = require("@civ-clone/core-spaceship/Rules/Lost");
 const Spaceship_1 = require("@civ-clone/core-spaceship/Spaceship");
-const getRules = (spaceshipRegistry = SpaceshipRegistry_1.instance, layoutRegistry = LayoutRegistry_1.instance, ruleRegistry = RuleRegistry_1.instance, turn = Turn_1.instance, year = Year_1.instance, engine = Engine_1.instance, randomNumberGenerator = () => Math.random()) => [
+const core_random_1 = require("@civ-clone/core-random");
+const getRules = (spaceshipRegistry = SpaceshipRegistry_1.instance, layoutRegistry = LayoutRegistry_1.instance, ruleRegistry = RuleRegistry_1.instance, turn = Turn_1.instance, year = Year_1.instance, engine = Engine_1.instance, randomNumberGenerator = core_random_1.instance) => [
     new Lost_1.default(new Effect_1.default((spaceship) => {
         engine.emit('player:spaceship:lost', spaceship.player());
     })),

@@ -55,6 +55,7 @@
     "@civ-clone/core-engine": "^0.1.3",
     "@civ-clone/core-game-year": "^0.1.2",
     "@civ-clone/core-player": "^0.1.7",
+    "@civ-clone/core-random": "^0.1.0",
     "@civ-clone/core-rule": "^0.1.0",
     "@civ-clone/core-spaceship": "^0.1.1",
     "@civ-clone/core-treasury": "^0.1.3",

@@ -29,6 +29,7 @@ import Effect from '@civ-clone/core-rule/Effect';
 import Part from '@civ-clone/core-spaceship/Part';
 import Player from '@civ-clone/core-player/Player';
 import Spaceship from '@civ-clone/core-spaceship/Spaceship';
+import { instance as rngInstance } from '@civ-clone/core-random';
 
 export const getRules = (
   currentPlayerRegistry: CurrentPlayerRegistry = currentPlayerRegistryInstance,
@@ -37,7 +38,7 @@ export const getRules = (
   ruleRegistry: RuleRegistry = ruleRegistryInstance,
   turn: Turn = turnInstance,
   year: Year = yearInstance,
-  randomNumberGenerator: () => number = () => Math.random()
+  randomNumberGenerator: () => number = rngInstance
 ): BuildingComplete[] => [
   new BuildingComplete(
     new Criterion(
