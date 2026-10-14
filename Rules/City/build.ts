@@ -36,6 +36,7 @@ export const getRules = (
   spaceshipRegistry: SpaceshipRegistry = spaceshipRegistryInstance
 ): Build[] => [
   new Build(
+    Part,
     new Criterion((city: City, BuildItem: IConstructor): boolean =>
       Object.prototype.isPrototypeOf.call(Part, BuildItem)
     ),
@@ -48,6 +49,7 @@ export const getRules = (
   ),
 
   new Build(
+    Part,
     new Criterion((city: City, BuildItem: IConstructor): boolean =>
       Object.prototype.isPrototypeOf.call(Part, BuildItem)
     ),
@@ -77,6 +79,7 @@ export const getRules = (
   ).map(
     ([PartType, RequiredAdvance]): Build =>
       new Build(
+        PartType,
         new Criterion(
           (city: City, BuildItem: IConstructor): boolean =>
             BuildItem === PartType

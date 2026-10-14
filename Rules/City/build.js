@@ -14,8 +14,8 @@ const Plastics_1 = require("@civ-clone/base-science-advance-plastics/Plastics");
 const Robotics_1 = require("@civ-clone/base-science-advance-robotics/Robotics");
 const SpaceFlight_1 = require("@civ-clone/base-science-advance-spaceflight/SpaceFlight");
 const getRules = (wonderRegistry = WonderRegistry_1.instance, playerResearchRegistry = PlayerResearchRegistry_1.instance, spaceshipRegistry = SpaceshipRegistry_1.instance) => [
-    new Build_1.Build(new Criterion_1.default((city, BuildItem) => Object.prototype.isPrototypeOf.call(Part_1.default, BuildItem)), new Effect_1.default(() => new Criterion_1.default(() => wonderRegistry.some((wonder) => wonder instanceof ApolloProgram_1.default)))),
-    new Build_1.Build(new Criterion_1.default((city, BuildItem) => Object.prototype.isPrototypeOf.call(Part_1.default, BuildItem)), new Effect_1.default((city) => new Criterion_1.default(() => {
+    new Build_1.Build(Part_1.default, new Criterion_1.default((city, BuildItem) => Object.prototype.isPrototypeOf.call(Part_1.default, BuildItem)), new Effect_1.default(() => new Criterion_1.default(() => wonderRegistry.some((wonder) => wonder instanceof ApolloProgram_1.default)))),
+    new Build_1.Build(Part_1.default, new Criterion_1.default((city, BuildItem) => Object.prototype.isPrototypeOf.call(Part_1.default, BuildItem)), new Effect_1.default((city) => new Criterion_1.default(() => {
         const spaceship = spaceshipRegistry.getActiveByPlayer(city.player());
         if (spaceship === null) {
             return false;
@@ -29,7 +29,7 @@ const getRules = (wonderRegistry = WonderRegistry_1.instance, playerResearchRegi
         [Parts_1.Habitation, Robotics_1.default],
         [Parts_1.LifeSupport, Robotics_1.default],
         [Parts_1.Power, Robotics_1.default],
-    ].map(([PartType, RequiredAdvance]) => new Build_1.Build(new Criterion_1.default((city, BuildItem) => BuildItem === PartType), new Effect_1.default((city) => new Criterion_1.default(() => playerResearchRegistry
+    ].map(([PartType, RequiredAdvance]) => new Build_1.Build(PartType, new Criterion_1.default((city, BuildItem) => BuildItem === PartType), new Effect_1.default((city) => new Criterion_1.default(() => playerResearchRegistry
         .getByPlayer(city.player())
         .completed(RequiredAdvance))))),
 ];
