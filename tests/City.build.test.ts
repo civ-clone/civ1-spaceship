@@ -14,7 +14,7 @@ import { BuildableInstance } from '@civ-clone/core-city-build/Buildable';
 import BuildingComplete from '@civ-clone/core-city-build/Rules/BulidingComplete';
 import CityBuild from '@civ-clone/core-city-build/CityBuild';
 import Criterion from '@civ-clone/core-rule/Criterion';
-import CurrentPlayerRegistry from '@civ-clone/core-player/CurrentPlayerRegistry';
+import PlayerRegistry from '@civ-clone/core-player/PlayerRegistry';
 import Effect from '@civ-clone/core-rule/Effect';
 import Plastics from '@civ-clone/base-science-advance-plastics/Plastics';
 import PlayerResearch from '@civ-clone/core-science/PlayerResearch';
@@ -43,7 +43,7 @@ describe('City:build', () => {
   it('should include the expected `Part`s for the expected cost with the expected prerequisites', async () => {
     const availableBuildItemsRegistry = new AvailableCityBuildItemsRegistry(),
       advanceRegistry = new AdvanceRegistry(),
-      currentPlayerRegistry = new CurrentPlayerRegistry(),
+      playerRegistry = new PlayerRegistry(),
       layoutRegistry = new LayoutRegistry(),
       wonderRegistry = new WonderRegistry(),
       playerResearchRegistry = new PlayerResearchRegistry(),
@@ -70,7 +70,7 @@ describe('City:build', () => {
       Structural
     );
 
-    currentPlayerRegistry.register(city.player());
+    playerRegistry.register(city.player());
 
     layoutRegistry.register(Default);
 
@@ -80,7 +80,7 @@ describe('City:build', () => {
       ...build(wonderRegistry, playerResearchRegistry, spaceshipRegistry),
       ...buildCost(),
       ...buildingComplete(
-        currentPlayerRegistry,
+        playerRegistry,
         spaceshipRegistry,
         layoutRegistry,
         ruleRegistry
