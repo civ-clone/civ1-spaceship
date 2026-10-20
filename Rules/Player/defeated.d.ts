@@ -1,6 +1,6 @@
 import { SpaceshipRegistry } from '@civ-clone/core-spaceship/SpaceshipRegistry';
-import Start from '@civ-clone/core-turn-based-game/Rules/Start';
+import Defeated from '@civ-clone/core-player/Rules/Defeated';
 export declare const getRules: (
   spaceshipRegistry?: SpaceshipRegistry
-) => Start[];
+) => Defeated[];
 export default getRules;

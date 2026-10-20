@@ -1,11 +1,11 @@
 import {
-  CurrentPlayerRegistry,
-  instance as currentPlayerRegistryInstance,
-} from '@civ-clone/core-player/CurrentPlayerRegistry';
-import {
   LayoutRegistry,
   instance as layoutRegistryInstance,
 } from '@civ-clone/core-spaceship/LayoutRegistry';
+import {
+  PlayerRegistry,
+  instance as playerRegistryInstance,
+} from '@civ-clone/core-player/PlayerRegistry';
 import {
   RuleRegistry,
   instance as ruleRegistryInstance,
@@ -29,38 +29,35 @@ import Effect from '@civ-clone/core-rule/Effect';
 import Part from '@civ-clone/core-spaceship/Part';
 import Player from '@civ-clone/core-player/Player';
 import Spaceship from '@civ-clone/core-spaceship/Spaceship';
-import { instance as rngInstance } from '@civ-clone/core-random';
 
 export const getRules = (
-  currentPlayerRegistry: CurrentPlayerRegistry = currentPlayerRegistryInstance,
+  playerRegistry: PlayerRegistry = playerRegistryInstance,
   spaceshipRegistry: SpaceshipRegistry = spaceshipRegistryInstance,
   layoutRegistry: LayoutRegistry = layoutRegistryInstance,
   ruleRegistry: RuleRegistry = ruleRegistryInstance,
   turn: Turn = turnInstance,
-  year: Year = yearInstance,
-  randomNumberGenerator: () => number = rngInstance
+  year: Year = yearInstance
 ): BuildingComplete[] => [
   new BuildingComplete(
     new Criterion(
       (cityBuild: CityBuild, buildItem: BuildableInstance): buildItem is Part =>
         buildItem instanceof ApolloProgram
     ),
+    // The Apollo Program lets every civilization build a spaceship, each on a layout of its own.
     new Effect(() => {
       // TODO: if there is more than one layout, ask the player to choose.
-      const [LayoutType] = layoutRegistry.entries() as (typeof Default)[],
-        layout = new LayoutType(ruleRegistry);
+      const [LayoutType] = layoutRegistry.entries() as (typeof Default)[];
 
-      currentPlayerRegistry
+      playerRegistry
         .entries()
         .forEach((player: Player) =>
           spaceshipRegistry.register(
             new Spaceship(
               player,
-              layout,
+              new LayoutType(ruleRegistry),
               ruleRegistry,
               turn,
-              year,
-              randomNumberGenerator
+              year
             )
           )
         );

@@ -1,8 +1,10 @@
 import cityBuild from './Rules/City/build';
 import cityBuildCost from './Rules/City/build-cost';
 import cityBuildingComplete from './Rules/City/building-complete';
+import cityCaptured from './Rules/City/captured';
 import citySpend from './Rules/City/spend';
 import playerAction from './Rules/Player/action';
+import playerDefeated from './Rules/Player/defeated';
 import spaceshipActive from './Rules/Spaceship/active';
 import spaceshipBuilt from './Rules/Spaceship/built';
 import spaceshipChanceOfSuccess from './Rules/Spaceship/chance-of-success';
@@ -11,7 +13,7 @@ import spaceshipFlightTime from './Rules/Spaceship/flight-time';
 import spaceshipLanded from './Rules/Spaceship/landed';
 import spaceshipLost from './Rules/Spaceship/lost';
 import spaceshipYield from './Rules/Spaceship/yield';
-import turnStart from './Rules/Turn/start';
+import turnEnd from './Rules/Turn/end';
 import { Game, defaultGame } from '@civ-clone/core-game';
 
 export const register = (game: Game): void =>
@@ -19,16 +21,17 @@ export const register = (game: Game): void =>
     ...cityBuild(game.wonders, game.playerResearch, game.spaceships),
     ...cityBuildCost(),
     ...cityBuildingComplete(
-      game.currentPlayers,
+      game.players,
       game.spaceships,
       game.layouts,
       game.rules,
       game.turn,
-      game.year,
-      game.rng
+      game.year
     ),
+    ...cityCaptured(game.cityImprovements, game.spaceships),
     ...citySpend(),
     ...playerAction(game.spaceships),
+    ...playerDefeated(game.spaceships),
     ...spaceshipActive(),
     ...spaceshipBuilt(game.engine),
     ...spaceshipChanceOfSuccess(),
@@ -41,11 +44,10 @@ export const register = (game: Game): void =>
       game.rules,
       game.turn,
       game.year,
-      game.engine,
-      game.rng
+      game.engine
     ),
     ...spaceshipYield(),
-    ...turnStart(game.spaceships)
+    ...turnEnd(game.spaceships, game.players)
   );
 
 // The plugin loader imports each package for this side effect. Until it passes
