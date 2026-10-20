@@ -11,7 +11,6 @@ export declare const getRules: (
   ruleRegistry?: RuleRegistry,
   turn?: Turn,
   year?: Year,
-  engine?: Engine,
-  randomNumberGenerator?: () => number
+  engine?: Engine
 ) => Lost[];
 export default getRules;
