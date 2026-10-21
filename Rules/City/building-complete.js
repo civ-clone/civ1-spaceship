@@ -23,7 +23,14 @@ const getRules = (playerRegistry = PlayerRegistry_1.instance, spaceshipRegistry 
             .entries()
             .forEach((player) => spaceshipRegistry.register(new Spaceship_1.default(player, new LayoutType(ruleRegistry), ruleRegistry, turn, year)));
     })),
-    new BulidingComplete_1.default(new Criterion_1.default((cityBuild, buildItem) => buildItem instanceof Part_1.default), new Criterion_1.default((cityBuild, buildItem) => spaceshipRegistry.getActiveByPlayer(buildItem.city().player()) !== null), new Effect_1.default((cityBuild, buildItem) => {
+    new BulidingComplete_1.default(new Criterion_1.default((cityBuild, buildItem) => buildItem instanceof Part_1.default), 
+    // Only onto a ship still being built: a part finished after its ship launched is left behind, as the ship can't
+    //  change in flight.
+    new Criterion_1.default((cityBuild, buildItem) => {
+        var _a;
+        return ((_a = spaceshipRegistry
+            .getActiveByPlayer(buildItem.city().player())) === null || _a === void 0 ? void 0 : _a.launched()) === false;
+    }), new Effect_1.default((cityBuild, buildItem) => {
         const part = buildItem;
         spaceshipRegistry.getActiveByPlayer(part.city().player()).add(part);
     })),
