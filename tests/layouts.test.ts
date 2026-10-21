@@ -1,4 +1,7 @@
+import ApolloProgram from '@civ-clone/base-wonder-apolloprogram/ApolloProgram';
 import ChooseSlotRule from '@civ-clone/core-spaceship/Rules/ChooseSlot';
+import PlayerRegistry from '@civ-clone/core-player/PlayerRegistry';
+import WonderRegistry from '@civ-clone/core-wonder/WonderRegistry';
 import Default from '@civ-clone/civ1-default-spaceship-layout/Default';
 import Effect from '@civ-clone/core-rule/Effect';
 import LayoutRegistry from '@civ-clone/core-spaceship/LayoutRegistry';
@@ -100,5 +103,131 @@ describe('ships sharing a layout', (): void => {
     ruleRegistry.process(Start, turn);
 
     expect(spaceshipRegistry.getActiveByPlayer(ours.player())).to.equal(ourNew);
+  });
+});
+
+describe('turn start', (): void => {
+  const setUp = () => {
+    const ruleRegistry = new RuleRegistry(),
+      spaceshipRegistry = new SpaceshipRegistry(),
+      layoutRegistry = new LayoutRegistry(),
+      turn = new Turn(),
+      year = new Year(turn, ruleRegistry);
+
+    layoutRegistry.register(Default);
+    ruleRegistry.register(
+      ...active(),
+      ...chooseSlot(),
+      new YearRule(new Effect((turn: number) => turn))
+    );
+
+    return { layoutRegistry, ruleRegistry, spaceshipRegistry, turn, year };
+  };
+
+  it('separates a ship being built from a launched one it shares a layout with', async (): Promise<void> => {
+    const { layoutRegistry, ruleRegistry, spaceshipRegistry, turn, year } =
+        setUp(),
+      [ours, theirs] = await Promise.all([
+        setUpCity({ ruleRegistry }),
+        setUpCity({ ruleRegistry }),
+      ]),
+      shared = new Default(ruleRegistry),
+      building = new Spaceship(ours.player(), shared, ruleRegistry, turn, year),
+      flying = new Spaceship(theirs.player(), shared, ruleRegistry, turn, year);
+
+    ruleRegistry.register(
+      ...turnStart(spaceshipRegistry, layoutRegistry, ruleRegistry, turn, year)
+    );
+    spaceshipRegistry.register(building, flying);
+    (flying as unknown as { _launched: number })._launched = 0;
+
+    ruleRegistry.process(Start, turn);
+
+    expect(spaceshipRegistry.getActiveByPlayer(ours.player())).to.not.equal(
+      building
+    );
+    expect(
+      spaceshipRegistry.getActiveByPlayer(ours.player())!.layout()
+    ).to.not.equal(shared);
+  });
+
+  it('gives a ship to a player who came into the game after the Apollo Program', async (): Promise<void> => {
+    const { layoutRegistry, ruleRegistry, spaceshipRegistry, turn, year } =
+        setUp(),
+      city = await setUpCity({ ruleRegistry }),
+      newcomer = city.player(),
+      wonderRegistry = new WonderRegistry(),
+      playerRegistry = new PlayerRegistry();
+
+    playerRegistry.register(newcomer);
+    ruleRegistry.register(
+      ...turnStart(
+        spaceshipRegistry,
+        layoutRegistry,
+        ruleRegistry,
+        turn,
+        year,
+        undefined,
+        undefined,
+        playerRegistry,
+        wonderRegistry
+      )
+    );
+
+    ruleRegistry.process(Start, turn);
+
+    expect(spaceshipRegistry.getActiveByPlayer(newcomer)).to.equal(null);
+
+    wonderRegistry.register(new ApolloProgram(city, ruleRegistry));
+    ruleRegistry.process(Start, turn);
+
+    expect(spaceshipRegistry.getActiveByPlayer(newcomer)).to.not.equal(null);
+  });
+
+  it('stops the cities of a player whose ship is in flight building parts', async (): Promise<void> => {
+    const { layoutRegistry, ruleRegistry, spaceshipRegistry, turn, year } =
+        setUp(),
+      city = await setUpCity({ ruleRegistry }),
+      revalidated: string[] = [],
+      spaceship = new Spaceship(
+        city.player(),
+        new Default(ruleRegistry),
+        ruleRegistry,
+        turn,
+        year
+      ),
+      cityBuild = (Item: unknown, name: string) => ({
+        building: () => ({ item: () => Item }),
+        revalidate: () => revalidated.push(name),
+      }),
+      builds = [cityBuild(Structural, 'part'), cityBuild(Default, 'other')];
+
+    ruleRegistry.register(
+      ...turnStart(
+        spaceshipRegistry,
+        layoutRegistry,
+        ruleRegistry,
+        turn,
+        year,
+        { getByPlayer: () => [city, city] } as any,
+        {
+          getByCity: (() => {
+            let index = 0;
+
+            return () => builds[index++ % builds.length];
+          })(),
+        } as any
+      )
+    );
+    spaceshipRegistry.register(spaceship);
+
+    ruleRegistry.process(Start, turn);
+
+    expect(revalidated).to.deep.equal([]);
+
+    (spaceship as unknown as { _launched: number })._launched = 0;
+    ruleRegistry.process(Start, turn);
+
+    expect(revalidated).to.deep.equal(['part']);
   });
 });

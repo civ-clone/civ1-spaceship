@@ -1,4 +1,20 @@
 import {
+  CityBuildRegistry,
+  instance as cityBuildRegistryInstance,
+} from '@civ-clone/core-city-build/CityBuildRegistry';
+import {
+  CityRegistry,
+  instance as cityRegistryInstance,
+} from '@civ-clone/core-city/CityRegistry';
+import {
+  PlayerRegistry,
+  instance as playerRegistryInstance,
+} from '@civ-clone/core-player/PlayerRegistry';
+import {
+  WonderRegistry,
+  instance as wonderRegistryInstance,
+} from '@civ-clone/core-wonder/WonderRegistry';
+import {
   LayoutRegistry,
   instance as layoutRegistryInstance,
 } from '@civ-clone/core-spaceship/LayoutRegistry';
@@ -15,7 +31,10 @@ import {
   instance as turnInstance,
 } from '@civ-clone/core-turn-based-game/Turn';
 import { Year, instance as yearInstance } from '@civ-clone/core-game-year/Year';
+import ApolloProgram from '@civ-clone/base-wonder-apolloprogram/ApolloProgram';
 import ChooseSlot from '@civ-clone/core-spaceship/Rules/ChooseSlot';
+import City from '@civ-clone/core-city/City';
+import Player from '@civ-clone/core-player/Player';
 import Default from '@civ-clone/civ1-default-spaceship-layout/Default';
 import Effect from '@civ-clone/core-rule/Effect';
 import Layout from '@civ-clone/core-spaceship/Layout';
@@ -29,7 +48,11 @@ export const getRules = (
   layoutRegistry: LayoutRegistry = layoutRegistryInstance,
   ruleRegistry: RuleRegistry = ruleRegistryInstance,
   turn: Turn = turnInstance,
-  year: Year = yearInstance
+  year: Year = yearInstance,
+  cityRegistry: CityRegistry = cityRegistryInstance,
+  cityBuildRegistry: CityBuildRegistry = cityBuildRegistryInstance,
+  playerRegistry: PlayerRegistry = playerRegistryInstance,
+  wonderRegistry: WonderRegistry = wonderRegistryInstance
 ): Start[] => [
   // Before 0.1.3 the Apollo Program gave every player's ship the same layout, so each player's parts went into all of
   //  them. A game saved then shares it still: each ship still being built gets a layout of its own, with the parts
@@ -37,17 +60,15 @@ export const getRules = (
   new Start(
     'civ1-spaceship:turn/start/own-layouts',
     new Effect((): void => {
-      const building = spaceshipRegistry
-          .entries()
-          .filter(
-            (spaceship: Spaceship): boolean =>
-              spaceship.successful() === null && spaceship.launched() === false
-          ),
-        shared = building.filter((spaceship: Spaceship): boolean =>
-          building.some(
-            (other: Spaceship): boolean =>
-              other !== spaceship && other.layout() === spaceship.layout()
-          )
+      const spaceships = spaceshipRegistry.entries(),
+        shared = spaceships.filter(
+          (spaceship: Spaceship): boolean =>
+            spaceship.successful() === null &&
+            spaceship.launched() === false &&
+            spaceships.some(
+              (other: Spaceship): boolean =>
+                other !== spaceship && other.layout() === spaceship.layout()
+            )
         );
 
       shared.forEach((spaceship: Spaceship): void => {
@@ -81,6 +102,65 @@ export const getRules = (
         spaceshipRegistry.unregister(spaceship);
         spaceshipRegistry.register(replacement);
       });
+    })
+  ),
+
+  // A ship can't change in flight, so its player's cities stop building parts for it (they would only be left behind),
+  //  before this turn's shields go into them.
+  new Start(
+    'civ1-spaceship:turn/start/stop-parts-in-flight',
+    new Effect((): void =>
+      spaceshipRegistry
+        .entries()
+        .filter(
+          (spaceship: Spaceship): boolean =>
+            spaceship.successful() === null && spaceship.launched() !== false
+        )
+        .forEach((spaceship: Spaceship): void =>
+          cityRegistry
+            .getByPlayer(spaceship.player())
+            .map((city: City) => cityBuildRegistry.getByCity(city))
+            .filter(
+              (cityBuild) =>
+                cityBuild.building()?.item().prototype instanceof Part
+            )
+            .forEach((cityBuild) => cityBuild.revalidate())
+        )
+    )
+  ),
+
+  // The Apollo Program gives a ship to every player there is when it's built. One who comes into the game later (a
+  //  destroyed civilization coming back, #178) gets one too.
+  new Start(
+    'civ1-spaceship:turn/start/ships-for-newcomers',
+    new Effect((): void => {
+      if (
+        !wonderRegistry
+          .entries()
+          .some((wonder): boolean => wonder instanceof ApolloProgram)
+      ) {
+        return;
+      }
+
+      playerRegistry
+        .entries()
+        .filter(
+          (player: Player): boolean =>
+            spaceshipRegistry.getBy('player', player).length === 0
+        )
+        .forEach((player: Player): void => {
+          const [LayoutType] = layoutRegistry.entries() as (typeof Default)[];
+
+          spaceshipRegistry.register(
+            new Spaceship(
+              player,
+              new LayoutType(ruleRegistry),
+              ruleRegistry,
+              turn,
+              year
+            )
+          );
+        });
     })
   ),
 ];

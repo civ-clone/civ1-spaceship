@@ -1,3 +1,7 @@
+import { CityBuildRegistry } from '@civ-clone/core-city-build/CityBuildRegistry';
+import { CityRegistry } from '@civ-clone/core-city/CityRegistry';
+import { PlayerRegistry } from '@civ-clone/core-player/PlayerRegistry';
+import { WonderRegistry } from '@civ-clone/core-wonder/WonderRegistry';
 import { LayoutRegistry } from '@civ-clone/core-spaceship/LayoutRegistry';
 import { RuleRegistry } from '@civ-clone/core-rule/RuleRegistry';
 import { SpaceshipRegistry } from '@civ-clone/core-spaceship/SpaceshipRegistry';
@@ -9,6 +13,10 @@ export declare const getRules: (
   layoutRegistry?: LayoutRegistry,
   ruleRegistry?: RuleRegistry,
   turn?: Turn,
-  year?: Year
+  year?: Year,
+  cityRegistry?: CityRegistry,
+  cityBuildRegistry?: CityBuildRegistry,
+  playerRegistry?: PlayerRegistry,
+  wonderRegistry?: WonderRegistry
 ) => Start[];
 export default getRules;

@@ -54,7 +54,11 @@ export const register = (game: Game): void =>
       game.layouts,
       game.rules,
       game.turn,
-      game.year
+      game.year,
+      game.cities,
+      game.cityBuilds,
+      game.players,
+      game.wonders
     )
   );
 
