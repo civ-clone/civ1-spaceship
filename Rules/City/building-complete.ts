@@ -68,11 +68,13 @@ export const getRules = (
       (cityBuild: CityBuild, buildItem: BuildableInstance): buildItem is Part =>
         buildItem instanceof Part
     ),
+    // Only onto a ship still being built: a part finished after its ship launched is left behind, as the ship can't
+    //  change in flight.
     new Criterion(
       (cityBuild: CityBuild, buildItem: BuildableInstance) =>
-        spaceshipRegistry.getActiveByPlayer(
-          (buildItem as Part).city().player()
-        ) !== null
+        spaceshipRegistry
+          .getActiveByPlayer((buildItem as Part).city().player())
+          ?.launched() === false
     ),
     new Effect((cityBuild: CityBuild, buildItem: BuildableInstance) => {
       const part = buildItem as Part;

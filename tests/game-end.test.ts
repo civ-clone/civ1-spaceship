@@ -237,6 +237,29 @@ describe('a civilization destroyed', (): void => {
   });
 });
 
+describe('a part finished after the ship launched', (): void => {
+  it('is left off the ship in flight', async (): Promise<void> => {
+    const { addShip, ruleRegistry, turn } = setUp(),
+      city = await setUpCity({ ruleRegistry }),
+      spaceship = addShip(city.player());
+
+    spaceship.add(new Structural(city, ruleRegistry));
+    turn.set(300);
+    // As though launched: with only a Structural on it, its flight would never end.
+    (spaceship as unknown as { _launched: number })._launched = 300;
+
+    ruleRegistry.process(
+      BuildingComplete,
+      new CityBuild(city, undefined, ruleRegistry),
+      new Structural(city, ruleRegistry)
+    );
+
+    expect(
+      spaceship.activeParts().length + spaceship.inactiveParts().length
+    ).to.equal(1);
+  });
+});
+
 describe('the Apollo Program', (): void => {
   it('gives every civilization a ship of its own', async (): Promise<void> => {
     const { playerRegistry, ruleRegistry, spaceshipRegistry } = setUp(),
