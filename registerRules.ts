@@ -14,6 +14,7 @@ import spaceshipLanded from './Rules/Spaceship/landed';
 import spaceshipLost from './Rules/Spaceship/lost';
 import spaceshipYield from './Rules/Spaceship/yield';
 import turnEnd from './Rules/Turn/end';
+import turnStart from './Rules/Turn/start';
 import { Game, defaultGame } from '@civ-clone/core-game';
 
 export const register = (game: Game): void =>
@@ -47,7 +48,14 @@ export const register = (game: Game): void =>
       game.engine
     ),
     ...spaceshipYield(),
-    ...turnEnd(game.spaceships, game.players)
+    ...turnEnd(game.spaceships, game.players),
+    ...turnStart(
+      game.spaceships,
+      game.layouts,
+      game.rules,
+      game.turn,
+      game.year
+    )
   );
 
 // The plugin loader imports each package for this side effect. Until it passes
