@@ -1,4 +1,9 @@
-import cityBuild from './Rules/City/build';
+import { deriveBuildRules, notLaunchedRule } from './Rules/City/build';
+import {
+  describedRequirements,
+  requiresAdvance,
+  requiresWonder,
+} from './Requirements';
 import cityBuildCost from './Rules/City/build-cost';
 import cityBuildingComplete from './Rules/City/building-complete';
 import cityCaptured from './Rules/City/captured';
@@ -17,9 +22,18 @@ import turnEnd from './Rules/Turn/end';
 import turnStart from './Rules/Turn/start';
 import { Game, defaultGame } from '@civ-clone/core-game';
 
-export const register = (game: Game): void =>
+export const register = (game: Game): void => {
+  const deriveBuildRule = deriveBuildRules(game.wonders, game.playerResearch);
+
+  // Which parts a city may build, from the entries in `Requirements`, around the hand-written rule for an unlaunched
+  //  spaceship: each rule lands where it always was, first among this package's rules, so nothing moves in the order
+  //  rules run (civ-clone/web-renderer#37).
+  game.requirements.add(deriveBuildRule, ...requiresWonder);
+  game.rules.register(notLaunchedRule(game.spaceships));
+  game.requirements.add(deriveBuildRule, ...requiresAdvance);
+  game.requirements.add(null, ...describedRequirements);
+
   game.rules.register(
-    ...cityBuild(game.wonders, game.playerResearch, game.spaceships),
     ...cityBuildCost(),
     ...cityBuildingComplete(
       game.players,
@@ -61,6 +75,7 @@ export const register = (game: Game): void =>
       game.wonders
     )
   );
+};
 
 // The plugin loader imports each package for this side effect. Until it passes
 // a `Game` of its own, dropping it would produce a game with silently absent
