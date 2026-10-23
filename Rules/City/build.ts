@@ -17,6 +17,7 @@ import {
   instance as wonderRegistryInstance,
 } from '@civ-clone/core-wonder/WonderRegistry';
 import Advance from '@civ-clone/core-science/Advance';
+import PlayerResearch from '@civ-clone/core-science/PlayerResearch';
 import City from '@civ-clone/core-city/City';
 import Criterion from '@civ-clone/core-rule/Criterion';
 import { Deriver } from '@civ-clone/core-requirement/RequirementRegistry';
@@ -64,6 +65,29 @@ export const buildRulesFor = (
     return [];
   }
 
+  // Whose Wonder or advance counts is the entry's `range`: the Apollo Program is anyone's (`world`), an advance the
+  //  city's player's (`player`).
+  const has = (city: City, target: Target): boolean => {
+    if (Object.prototype.isPrototypeOf.call(Wonder, target)) {
+      const isTarget = (wonder: Wonder): boolean =>
+        wonder instanceof (target as typeof Wonder);
+
+      return entry.range === 'world'
+        ? wonderRegistry.some(isTarget)
+        : entry.range === 'city'
+        ? wonderRegistry.getByCity(city).some(isTarget)
+        : wonderRegistry.getByPlayer(city.player()).some(isTarget);
+    }
+
+    return entry.range === 'world'
+      ? playerResearchRegistry.some((playerResearch: PlayerResearch): boolean =>
+          playerResearch.completed(target as typeof Advance)
+        )
+      : playerResearchRegistry
+          .getByPlayer(city.player())
+          .completed(target as typeof Advance);
+  };
+
   return [
     new Build(
       entry.id,
@@ -76,16 +100,7 @@ export const buildRulesFor = (
       new Effect(
         (city: City): IBuildCriterion =>
           new Criterion((): boolean =>
-            met(entry, (target: Target): boolean =>
-              Object.prototype.isPrototypeOf.call(Wonder, target)
-                ? wonderRegistry.some(
-                    (wonder: Wonder): boolean =>
-                      wonder instanceof (target as typeof Wonder)
-                  )
-                : playerResearchRegistry
-                    .getByPlayer(city.player())
-                    .completed(target as typeof Advance)
-            )
+            met(entry, (target: Target): boolean => has(city, target))
           )
       )
     ),

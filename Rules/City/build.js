@@ -29,14 +29,27 @@ const buildRulesFor = (entry, wonderRegistry = WonderRegistry_1.instance, player
     if (entry.relation !== 'requires') {
         return [];
     }
+    // Whose Wonder or advance counts is the entry's `range`: the Apollo Program is anyone's (`world`), an advance the
+    //  city's player's (`player`).
+    const has = (city, target) => {
+        if (Object.prototype.isPrototypeOf.call(Wonder_1.default, target)) {
+            const isTarget = (wonder) => wonder instanceof target;
+            return entry.range === 'world'
+                ? wonderRegistry.some(isTarget)
+                : entry.range === 'city'
+                    ? wonderRegistry.getByCity(city).some(isTarget)
+                    : wonderRegistry.getByPlayer(city.player()).some(isTarget);
+        }
+        return entry.range === 'world'
+            ? playerResearchRegistry.some((playerResearch) => playerResearch.completed(target))
+            : playerResearchRegistry
+                .getByPlayer(city.player())
+                .completed(target);
+    };
     return [
         new Build_1.Build(entry.id, entry.subject, new Criterion_1.default((city, BuildItem) => entry.subject === Part_1.default
             ? Object.prototype.isPrototypeOf.call(Part_1.default, BuildItem)
-            : BuildItem === entry.subject), new Effect_1.default((city) => new Criterion_1.default(() => (0, Requirement_1.met)(entry, (target) => Object.prototype.isPrototypeOf.call(Wonder_1.default, target)
-            ? wonderRegistry.some((wonder) => wonder instanceof target)
-            : playerResearchRegistry
-                .getByPlayer(city.player())
-                .completed(target))))),
+            : BuildItem === entry.subject), new Effect_1.default((city) => new Criterion_1.default(() => (0, Requirement_1.met)(entry, (target) => has(city, target))))),
     ];
 };
 exports.buildRulesFor = buildRulesFor;
