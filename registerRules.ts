@@ -7,7 +7,6 @@ import {
 import cityBuildCost from './Rules/City/build-cost';
 import cityBuildingComplete from './Rules/City/building-complete';
 import cityCaptured from './Rules/City/captured';
-import citySpend from './Rules/City/spend';
 import playerAction from './Rules/Player/action';
 import playerDefeated from './Rules/Player/defeated';
 import spaceshipActive from './Rules/Spaceship/active';
@@ -44,7 +43,6 @@ export const register = (game: Game): void => {
       game.year
     ),
     ...cityCaptured(game.cityImprovements, game.spaceships),
-    ...citySpend(),
     ...playerAction(game.spaceships),
     ...playerDefeated(game.spaceships),
     ...spaceshipActive(),
