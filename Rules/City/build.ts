@@ -63,9 +63,9 @@ export const notLaunchedRule = (
  *
  * A Wonder in a `world` entry counts once it has ever been built, even if it has been lost with its city since
  * (civ-clone/web-renderer#971): v474.05 leaves parts out of the production menu only while the Apollo Program has never
- * been built, or once the civilization has launched (`ECONOMY.C` 202:
+ * been built, or once the civilization has launched (`ECONOMY.C` `find_slot` 220:
  * `if (i > 21 && (marvel_site[19] == -1 || (game_flags & (1 << civ)))) continue;`), and a Wonder lost with its city is
- * `0x80`, not `-1` (`ECONOMY.C` 94-96). In a `city` or `player` entry it counts only while it stands there.
+ * `0x80`, not `-1` (`ECONOMY.C` `vanish` 113-114). In a `city` or `player` entry it counts only while it stands there.
  */
 export const buildRulesFor = (
   entry: Requirement,

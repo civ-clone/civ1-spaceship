@@ -54,9 +54,10 @@ const getRules = (spaceshipRegistry = SpaceshipRegistry_1.instance, layoutRegist
     // The Apollo Program gives a ship to every player there is when it's built. One who comes into the game later (a
     //  destroyed civilization coming back, #178) gets one too, even once the Apollo Program has been lost with its city
     //  (civ-clone/web-renderer#971). v474.05 keeps no ship apart from the parts a civilization builds, and lets any
-    //  civilization that hasn't launched build them once the Apollo Program has ever been built (`ECONOMY.C` 202:
-    //  `if (i > 21 && (marvel_site[19] == -1 || (game_flags & (1 << civ)))) continue;`; a lost Wonder is `0x80`, not
-    //  `-1`, `ECONOMY.C` 94-96). Here parts need a ship to go into, so a newcomer needs one to build them.
+    //  civilization that hasn't launched build them once the Apollo Program has ever been built (`ECONOMY.C`
+    //  `find_slot` 220: `if (i > 21 && (marvel_site[19] == -1 || (game_flags & (1 << civ)))) continue;`; a lost
+    //  Wonder is `0x80`, not `-1`, `ECONOMY.C` `vanish` 113-114). Here parts need a ship to go into, so a newcomer needs
+    //  one to build them.
     new Start_1.default('civ1-spaceship:turn/start/ships-for-newcomers', new Effect_1.default(() => {
         if (!(0, wonderHistory_1.everBuilt)(ApolloProgram_1.default, wonderRegistry, cityImprovementRegistry)) {
             return;
