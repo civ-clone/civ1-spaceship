@@ -1,5 +1,9 @@
 import { Build, IBuildCriterion } from '@civ-clone/core-city-build/Rules/Build';
 import {
+  CityImprovementRegistry,
+  instance as cityImprovementRegistryInstance,
+} from '@civ-clone/core-city-improvement/CityImprovementRegistry';
+import {
   PlayerResearchRegistry,
   instance as playerResearchRegistryInstance,
 } from '@civ-clone/core-science/PlayerResearchRegistry';
@@ -25,6 +29,7 @@ import Effect from '@civ-clone/core-rule/Effect';
 import { IConstructor } from '@civ-clone/core-registry/Registry';
 import Part from '@civ-clone/core-spaceship/Part';
 import Wonder from '@civ-clone/core-wonder/Wonder';
+import { everBuilt } from '@civ-clone/civ1-wonder/lib/wonderHistory';
 import { requiresAdvance, requiresWonder } from '../../Requirements';
 
 /** Parts are only built for a spaceship that hasn't launched: a state of the game, so a rule written by hand. */
@@ -55,11 +60,18 @@ export const notLaunchedRule = (
  * The rule `entry` is played by: a city may build its subject only while its targets are met. A Wonder is met once
  * anyone in the world has built it, and an advance once the city's player has discovered it. An entry about `Part`
  * itself, which is never built, is about every part.
+ *
+ * A Wonder in a `world` entry counts once it has ever been built, even if it has been lost with its city since
+ * (civ-clone/web-renderer#971): v474.05 leaves parts out of the production menu only while the Apollo Program has never
+ * been built, or once the civilization has launched (`ECONOMY.C` 202:
+ * `if (i > 21 && (marvel_site[19] == -1 || (game_flags & (1 << civ)))) continue;`), and a Wonder lost with its city is
+ * `0x80`, not `-1` (`ECONOMY.C` 94-96). In a `city` or `player` entry it counts only while it stands there.
  */
 export const buildRulesFor = (
   entry: Requirement,
   wonderRegistry: WonderRegistry = wonderRegistryInstance,
-  playerResearchRegistry: PlayerResearchRegistry = playerResearchRegistryInstance
+  playerResearchRegistry: PlayerResearchRegistry = playerResearchRegistryInstance,
+  cityImprovementRegistry: CityImprovementRegistry = cityImprovementRegistryInstance
 ): Build[] => {
   if (entry.relation !== 'requires') {
     return [];
@@ -73,7 +85,11 @@ export const buildRulesFor = (
         wonder instanceof (target as typeof Wonder);
 
       return entry.range === 'world'
-        ? wonderRegistry.some(isTarget)
+        ? everBuilt(
+            target as typeof Wonder,
+            wonderRegistry,
+            cityImprovementRegistry
+          )
         : entry.range === 'city'
         ? wonderRegistry.getByCity(city).some(isTarget)
         : wonderRegistry.getByPlayer(city.player()).some(isTarget);
@@ -111,10 +127,16 @@ export const buildRulesFor = (
 export const deriveBuildRules =
   (
     wonderRegistry: WonderRegistry,
-    playerResearchRegistry: PlayerResearchRegistry
+    playerResearchRegistry: PlayerResearchRegistry,
+    cityImprovementRegistry: CityImprovementRegistry = cityImprovementRegistryInstance
   ): Deriver =>
   (entry: Requirement): Build[] =>
-    buildRulesFor(entry, wonderRegistry, playerResearchRegistry);
+    buildRulesFor(
+      entry,
+      wonderRegistry,
+      playerResearchRegistry,
+      cityImprovementRegistry
+    );
 
 /**
  * Every rule about which parts a city may build, as `registerRules` registers them: the Apollo Program's, the
@@ -125,14 +147,25 @@ export const deriveBuildRules =
 export const getRules = (
   wonderRegistry: WonderRegistry = wonderRegistryInstance,
   playerResearchRegistry: PlayerResearchRegistry = playerResearchRegistryInstance,
-  spaceshipRegistry: SpaceshipRegistry = spaceshipRegistryInstance
+  spaceshipRegistry: SpaceshipRegistry = spaceshipRegistryInstance,
+  cityImprovementRegistry: CityImprovementRegistry = cityImprovementRegistryInstance
 ): Build[] => [
   ...requiresWonder.flatMap((entry: Requirement): Build[] =>
-    buildRulesFor(entry, wonderRegistry, playerResearchRegistry)
+    buildRulesFor(
+      entry,
+      wonderRegistry,
+      playerResearchRegistry,
+      cityImprovementRegistry
+    )
   ),
   notLaunchedRule(spaceshipRegistry),
   ...requiresAdvance.flatMap((entry: Requirement): Build[] =>
-    buildRulesFor(entry, wonderRegistry, playerResearchRegistry)
+    buildRulesFor(
+      entry,
+      wonderRegistry,
+      playerResearchRegistry,
+      cityImprovementRegistry
+    )
   ),
 ];
 
