@@ -1,4 +1,5 @@
 import { CityBuildRegistry } from '@civ-clone/core-city-build/CityBuildRegistry';
+import { CityImprovementRegistry } from '@civ-clone/core-city-improvement/CityImprovementRegistry';
 import { CityRegistry } from '@civ-clone/core-city/CityRegistry';
 import { PlayerRegistry } from '@civ-clone/core-player/PlayerRegistry';
 import { WonderRegistry } from '@civ-clone/core-wonder/WonderRegistry';
@@ -17,6 +18,7 @@ export declare const getRules: (
   cityRegistry?: CityRegistry,
   cityBuildRegistry?: CityBuildRegistry,
   playerRegistry?: PlayerRegistry,
-  wonderRegistry?: WonderRegistry
+  wonderRegistry?: WonderRegistry,
+  cityImprovementRegistry?: CityImprovementRegistry
 ) => Start[];
 export default getRules;

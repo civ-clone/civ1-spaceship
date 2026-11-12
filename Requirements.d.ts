@@ -2,7 +2,10 @@ import {
   Condition,
   Requirement,
 } from '@civ-clone/core-requirement/Requirement';
-/** Every part needs the Apollo Program built, by anyone: one rule, about all of them. */
+/**
+ * Every part needs the Apollo Program built, by anyone: one rule, about all of them. Having built it is enough: it counts
+ * even once lost with its city (civ-clone/web-renderer#971).
+ */
 export declare const requiresWonder: Requirement[];
 /** The advance a city's player needs before it can build each part: one rule each. */
 export declare const requiresAdvance: Requirement[];

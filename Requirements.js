@@ -10,7 +10,10 @@ const Robotics_1 = require("@civ-clone/base-science-advance-robotics/Robotics");
 const SpaceFlight_1 = require("@civ-clone/base-science-advance-spaceflight/SpaceFlight");
 // What Civilization's spaceship parts need, as the entries `Rules/City/build` makes its rules from
 //  (civ-clone/web-renderer#37). `registerRules` adds them to the game's `requirements`.
-/** Every part needs the Apollo Program built, by anyone: one rule, about all of them. */
+/**
+ * Every part needs the Apollo Program built, by anyone: one rule, about all of them. Having built it is enough: it counts
+ * even once lost with its city (civ-clone/web-renderer#971).
+ */
 exports.requiresWonder = (0, Requirement_1.table)('civ1-spaceship:city/build/requires-wonder', 'requires', [[Part_1.default, ApolloProgram_1.default]], {
     range: 'world',
 });

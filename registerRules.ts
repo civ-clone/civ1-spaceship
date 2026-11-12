@@ -22,7 +22,11 @@ import turnStart from './Rules/Turn/start';
 import { Game, defaultGame } from '@civ-clone/core-game';
 
 export const register = (game: Game): void => {
-  const deriveBuildRule = deriveBuildRules(game.wonders, game.playerResearch);
+  const deriveBuildRule = deriveBuildRules(
+    game.wonders,
+    game.playerResearch,
+    game.cityImprovements
+  );
 
   // Which parts a city may build, from the entries in `Requirements`, around the hand-written rule for an unlaunched
   //  spaceship: each rule lands where it always was, first among this package's rules, so nothing moves in the order
@@ -70,7 +74,8 @@ export const register = (game: Game): void => {
       game.cities,
       game.cityBuilds,
       game.players,
-      game.wonders
+      game.wonders,
+      game.cityImprovements
     )
   );
 };
