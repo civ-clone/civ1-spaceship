@@ -37,7 +37,7 @@
     "@civ-clone/base-science-advance-plastics": "^0.1.0",
     "@civ-clone/base-science-advance-robotics": "^0.1.0",
     "@civ-clone/base-science-advance-spaceflight": "^0.1.0",
-    "@civ-clone/base-spaceship": "github:civ-clone/base-spaceship#feat/initial",
+    "@civ-clone/base-spaceship": "^0.1.0",
     "@civ-clone/base-spaceship-fuel": "^0.1.0",
     "@civ-clone/base-spaceship-habitation": "^0.1.0",
     "@civ-clone/base-spaceship-life-support": "^0.1.0",
