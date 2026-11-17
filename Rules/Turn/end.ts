@@ -9,7 +9,7 @@ import {
 import Effect from '@civ-clone/core-rule/Effect';
 import End from '@civ-clone/core-turn-based-game/Rules/End';
 import High from '@civ-clone/core-rule/Priorities/High';
-import Player from '@civ-clone/core-player/Player';
+import landFirstArrival from '@civ-clone/base-spaceship/lib/landFirstArrival';
 
 export const getRules = (
   spaceshipRegistry: SpaceshipRegistry = spaceshipRegistryInstance,
@@ -23,17 +23,7 @@ export const getRules = (
     'civ1-spaceship:turn/end/arrival',
     new High(),
     new Effect((): void => {
-      playerRegistry.entries().some((player: Player): boolean => {
-        const spaceship = spaceshipRegistry.getActiveByPlayer(player);
-
-        if (spaceship === null) {
-          return false;
-        }
-
-        spaceship.check();
-
-        return spaceship.successful() === true;
-      });
+      landFirstArrival(playerRegistry, spaceshipRegistry);
     })
   ),
 ];

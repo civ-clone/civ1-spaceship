@@ -37,7 +37,6 @@ import {
 import { Year, instance as yearInstance } from '@civ-clone/core-game-year/Year';
 import ApolloProgram from '@civ-clone/base-wonder-apolloprogram/ApolloProgram';
 import ChooseSlot from '@civ-clone/core-spaceship/Rules/ChooseSlot';
-import City from '@civ-clone/core-city/City';
 import Player from '@civ-clone/core-player/Player';
 import Default from '@civ-clone/civ1-default-spaceship-layout/Default';
 import Effect from '@civ-clone/core-rule/Effect';
@@ -47,6 +46,8 @@ import Slot from '@civ-clone/core-spaceship/Slot';
 import Spaceship from '@civ-clone/core-spaceship/Spaceship';
 import Start from '@civ-clone/core-turn-based-game/Rules/Start';
 import { everBuilt } from '@civ-clone/civ1-wonder/lib/wonderHistory';
+import shipsForNewcomers from '@civ-clone/base-spaceship/lib/shipsForNewcomers';
+import stopPartsInFlight from '@civ-clone/base-spaceship/lib/stopPartsInFlight';
 
 export const getRules = (
   spaceshipRegistry: SpaceshipRegistry = spaceshipRegistryInstance,
@@ -116,22 +117,7 @@ export const getRules = (
   new Start(
     'civ1-spaceship:turn/start/stop-parts-in-flight',
     new Effect((): void =>
-      spaceshipRegistry
-        .entries()
-        .filter(
-          (spaceship: Spaceship): boolean =>
-            spaceship.successful() === null && spaceship.launched() !== false
-        )
-        .forEach((spaceship: Spaceship): void =>
-          cityRegistry
-            .getByPlayer(spaceship.player())
-            .map((city: City) => cityBuildRegistry.getByCity(city))
-            .filter(
-              (cityBuild) =>
-                cityBuild.building()?.item().prototype instanceof Part
-            )
-            .forEach((cityBuild) => cityBuild.revalidate())
-        )
+      stopPartsInFlight(spaceshipRegistry, cityRegistry, cityBuildRegistry)
     )
   ),
 
@@ -149,25 +135,17 @@ export const getRules = (
         return;
       }
 
-      playerRegistry
-        .entries()
-        .filter(
-          (player: Player): boolean =>
-            spaceshipRegistry.getBy('player', player).length === 0
-        )
-        .forEach((player: Player): void => {
-          const [LayoutType] = layoutRegistry.entries() as (typeof Default)[];
+      shipsForNewcomers(playerRegistry, spaceshipRegistry, (player: Player) => {
+        const [LayoutType] = layoutRegistry.entries() as (typeof Default)[];
 
-          spaceshipRegistry.register(
-            new Spaceship(
-              player,
-              new LayoutType(ruleRegistry),
-              ruleRegistry,
-              turn,
-              year
-            )
-          );
-        });
+        return new Spaceship(
+          player,
+          new LayoutType(ruleRegistry),
+          ruleRegistry,
+          turn,
+          year
+        );
+      });
     })
   ),
 ];
